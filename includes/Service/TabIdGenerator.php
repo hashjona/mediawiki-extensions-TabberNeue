@@ -16,11 +16,9 @@ class TabIdGenerator {
 	 * Generates a sanitized ID from a label, suitable as a base for a unique ID.
 	 */
 	public function generateSanitizedId( string $label ): string {
-		if ( $this->parseTabName ) {
-			$label = htmlspecialchars( strip_tags( $label ) );
-		}
-		//return Sanitizer::decodeCharReferencesAndNormalize( Sanitizer::escapeIdForAttribute( $label ) );
-		return $label;
+		$labelText = trim( strip_tags( Sanitizer::decodeCharReferencesAndNormalize( $label ) ) );
+
+		return Sanitizer::escapeIdForAttribute( $labelText );
 	}
 
 	/**

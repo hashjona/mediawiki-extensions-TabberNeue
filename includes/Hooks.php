@@ -12,6 +12,8 @@ use MediaWiki\Extension\TabberNeue\Service\TabParser;
 use MediaWiki\Hook\ParserFirstCallInitHook;
 use MediaWiki\HookContainer\HookContainer;
 use MediaWiki\Parser\Parser;
+use MediaWiki\Permissions\PermissionManager;
+use MediaWiki\User\UserFactory;
 
 class Hooks implements ParserFirstCallInitHook {
 
@@ -21,6 +23,8 @@ class Hooks implements ParserFirstCallInitHook {
 		private readonly HookContainer $hookContainer,
 		private readonly TabberRenderer $tabberRenderer,
 		private readonly Config $config,
+		private readonly PermissionManager $permissionManager,
+		private readonly UserFactory $userFactory,
 	) {
 	}
 
@@ -41,6 +45,8 @@ class Hooks implements ParserFirstCallInitHook {
 			$this->tabIdGenerator,
 			$this->hookContainer,
 			$this->config,
+			$this->permissionManager,
+			$this->userFactory,
 		), 'parserHook' ] );
 	}
 

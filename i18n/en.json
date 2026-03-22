@@ -45,5 +45,8 @@
     "tabberneue-visualeditor-mwtabbertranscludeinspector-error-empty-both": "The following tabs have empty labels: $1; and the following tabs have empty page names: $2. Please provide a label and valid page name for each tab.",
     "tabberneue-visualeditor-copy-suffix": "$1 (copy)",
     "tabberneue-error-tabs-title": "The following errors occurred while processing tabs:",
-    "tabberneue-error-tabs-duplicate-label": "The tab label '$1' is already in use."
+    "tabberneue-error-tabs-duplicate-label": "The tab label '$1' is already in use.",
+    "tabberneue-error-transclusion-invalid-title": "Invalid page title: $1.",
+    "tabberneue-error-transclusion-unavailable": "The requested transcluded page does not exist or you do not have permission to view it.",
+    "tabberneue-error-transclusion-processing": "Error processing tab."
 }

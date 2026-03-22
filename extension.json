@@ -177,7 +177,9 @@
 				"TabberNeue.TabIdGenerator",
 				"HookContainer",
 				"TabberNeue.TabberRenderer",
-				"MainConfig"
+				"MainConfig",
+				"PermissionManager",
+				"UserFactory"
 			]
 		}
 	},

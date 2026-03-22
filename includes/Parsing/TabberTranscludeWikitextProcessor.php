@@ -8,13 +8,17 @@ use MediaWiki\Extension\TabberNeue\Service\TabIdGenerator;
 use MediaWiki\Extension\TabberNeue\Service\TabParser;
 use MediaWiki\Html\Html;
 use MediaWiki\Parser\Parser;
+use MediaWiki\Permissions\PermissionManager;
 use MediaWiki\Title\Title;
+use MediaWiki\User\UserFactory;
 
 class TabberTranscludeWikitextProcessor implements WikitextProcessor {
 	public function __construct(
 		private Parser $parser,
 		private readonly TabParser $tabParser,
-		private readonly TabIdGenerator $tabIdGenerator
+		private readonly TabIdGenerator $tabIdGenerator,
+		private readonly PermissionManager $permissionManager,
+		private readonly UserFactory $userFactory
 	) {
 	}
 
@@ -59,13 +63,29 @@ class TabberTranscludeWikitextProcessor implements WikitextProcessor {
 
 		$title = Title::newFromText( trim( $content ) );
 		if ( $title === null ) {
-			return Html::errorBox( 'Invalid title: ' . htmlspecialchars( $content ) );
+			return $this->buildErrorBox( 'tabberneue-error-transclusion-invalid-title', $content );
 		}
 
-		if ( !$title->exists() ) {
-			return Html::errorBox( 'Page does not exist: ' . htmlspecialchars( $content ) );
+		if ( !$title->exists() || !$this->canReadTitle( $title ) ) {
+			return $this->buildErrorBox( 'tabberneue-error-transclusion-unavailable' );
 		}
 
 		return $title->getPrefixedText();
+	}
+
+	private function canReadTitle( Title $title ): bool {
+		$user = $this->userFactory->newFromUserIdentity( $this->parser->getUserIdentity() );
+
+		return $this->permissionManager->userCan( 'read', $user, $title );
+	}
+
+	/**
+	 * Wrap a localized error in a MediaWiki error box.
+	 *
+	 * @param string $messageKey Message key to render.
+	 * @param mixed ...$params Message parameters.
+	 */
+	private function buildErrorBox( string $messageKey, ...$params ): string {
+		return Html::errorBox( $this->parser->msg( $messageKey, ...$params )->escaped() );
 	}
 }

@@ -25,7 +25,9 @@ use MediaWiki\HookContainer\HookContainer;
 use MediaWiki\Html\Html;
 use MediaWiki\Parser\Parser;
 use MediaWiki\Parser\PPFrame;
+use MediaWiki\Permissions\PermissionManager;
 use MediaWiki\Title\Title;
+use MediaWiki\User\UserFactory;
 
 class TabberTransclude {
 
@@ -35,6 +37,8 @@ class TabberTransclude {
 		private readonly TabIdGenerator $tabIdGenerator,
 		private readonly HookContainer $hookContainer,
 		private readonly Config $config,
+		private readonly PermissionManager $permissionManager,
+		private readonly UserFactory $userFactory,
 	) {
 	}
 
@@ -53,7 +57,13 @@ class TabberTransclude {
 	 * Renders the necessary HTML for a <tabbertransclude> tag.
 	 */
 	public function render( string $input, array $args, Parser $parser, PPFrame $frame ): string {
-		$processor = new TabberTranscludeWikitextProcessor( $parser, $this->tabParser, $this->tabIdGenerator );
+		$processor = new TabberTranscludeWikitextProcessor(
+			$parser,
+			$this->tabParser,
+			$this->tabIdGenerator,
+			$this->permissionManager,
+			$this->userFactory
+		);
 		$tabModels = $processor->process( $input );
 
 		$resolvedModels = [];
@@ -67,7 +77,9 @@ class TabberTransclude {
 					$this->shouldInlineTab( $index )
 				);
 			} catch ( Exception ) {
-				$tabContent = Html::errorBox( 'Error processing tab: ' . $tabModel->label );
+				$tabContent = Html::errorBox(
+					$parser->msg( 'tabberneue-error-transclusion-processing' )->escaped()
+				);
 			}
 
 			$resolvedModels[] = new TabModel( $tabModel->name, $tabModel->label, $tabContent );
@@ -98,6 +110,12 @@ class TabberTransclude {
 			// The error state is already handled in TabberTranscludeWikitextProcessor::parseTabContent()
 			// TODO: This is not the best way to handle this.
 			return $pageName;
+		}
+
+		if ( !$title->exists() || !$this->canReadTitle( $title, $parser ) ) {
+			return Html::errorBox(
+				$parser->msg( 'tabberneue-error-transclusion-unavailable' )->escaped()
+			);
 		}
 
 		$titleText = $title->getPrefixedText();
@@ -142,5 +160,11 @@ class TabberTransclude {
 		);
 
 		return $html;
+	}
+
+	private function canReadTitle( Title $title, Parser $parser ): bool {
+		$user = $this->userFactory->newFromUserIdentity( $parser->getUserIdentity() );
+
+		return $this->permissionManager->userCan( 'read', $user, $title );
 	}
 }

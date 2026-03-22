@@ -43,5 +43,8 @@
 	"tabberneue-visualeditor-mwtabbertranscludeinspector-error-empty-both": "Error message when one or more tabs have empty labels or empty page names and the user tries to save.",
 	"tabberneue-visualeditor-copy-suffix": "Suffix added to a tab's label when duplicating it in Visual Editor.",
 	"tabberneue-error-tabs-title": "Intro for the error message box for the list of errors.",
-	"tabberneue-error-tabs-duplicate-label": "Error message when duplicate tab label is used."
+	"tabberneue-error-tabs-duplicate-label": "Error message when duplicate tab label is used.",
+	"tabberneue-error-transclusion-invalid-title": "Error message shown when a <nowiki><tabbertransclude></nowiki> entry contains an invalid page title. Parameters:\n* $1 - the invalid title text",
+	"tabberneue-error-transclusion-unavailable": "Error message shown when a transcluded page is missing or the current user is not allowed to read it.",
+	"tabberneue-error-transclusion-processing": "Generic error message shown when a transcluded tab fails to render."
 }
