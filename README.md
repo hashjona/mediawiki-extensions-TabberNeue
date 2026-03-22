@@ -82,7 +82,9 @@ Tab content I goes here.
 ### Transclusion
 With the transclusion mode, the syntax is different, and it's more similar to `<gallery>` syntax.
 
-The contents of the page of the first tab will be transcluded. Other tabs will be transcluded on-demand with AJAX, performing a request to the MediaWiki api. Once requested, they won't be fetched again until the page is reloaded. Note that Tabbers on the transcluded page will not be rendered.
+By default, the contents of the page of the first tab will be transcluded as part of the parent page output. Other tabs will be transcluded on-demand with AJAX, performing a request to the MediaWiki api. Once requested, they won't be fetched again until the page is reloaded. Note that Tabbers on the transcluded page will not be rendered.
+
+If you want the first tab to load the same way as the rest, set `$wgTabberNeueTranscludeFirstTabOnDemand = true;`.
 
 Tabs are created with `pageName|tabName`, and separated by a new line.
 ```html
@@ -137,6 +139,7 @@ Name | Description | Values | Default
 `$wgTabberNeueParseTabName` | Parse tab name as wikitext. This can have a performance impact and cause unexpected behaviors. |`true` - enable; `false` - disable | `false`
 `$wgTabberNeueUpdateLocationOnTabChange` | If enabled, when a tab is selected, the URL displayed on the browser changes. Opening this URL makes that tab initially selected |`true` - enable; `false` - disable | `true`
 `$wgTabberNeueAddTabPrefix` | If enabled, tabpanel IDs will be prepended with "tabber-" to avoid conflicts with page headings. |`true` - enable; `false` - disable | `true`
+`$wgTabberNeueTranscludeFirstTabOnDemand` | If enabled, `<tabbertransclude>` loads the first tab on demand through the API instead of rendering it as part of the parent page. |`true` - enable; `false` - disable | `false`
 
 #### Tracking category
 TabberNeue adds a tracking category to all pages using Tabber for maintenance purposes. There are two ways to suppress the category from viewers:

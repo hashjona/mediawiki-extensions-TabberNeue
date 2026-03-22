@@ -15,6 +15,7 @@ declare( strict_types=1 );
 namespace MediaWiki\Extension\TabberNeue;
 
 use Exception;
+use MediaWiki\Config\Config;
 use MediaWiki\Extension\TabberNeue\DataModel\TabModel;
 use MediaWiki\Extension\TabberNeue\Parsing\TabberTranscludeWikitextProcessor;
 use MediaWiki\Extension\TabberNeue\Service\TabberRenderer;
@@ -33,6 +34,7 @@ class TabberTransclude {
 		private readonly TabParser $tabParser,
 		private readonly TabIdGenerator $tabIdGenerator,
 		private readonly HookContainer $hookContainer,
+		private readonly Config $config,
 	) {
 	}
 
@@ -51,27 +53,21 @@ class TabberTransclude {
 	 * Renders the necessary HTML for a <tabbertransclude> tag.
 	 */
 	public function render( string $input, array $args, Parser $parser, PPFrame $frame ): string {
-		$isCurrentlySelectedTab = true;
-
 		$processor = new TabberTranscludeWikitextProcessor( $parser, $this->tabParser, $this->tabIdGenerator );
 		$tabModels = $processor->process( $input );
 
 		$resolvedModels = [];
-		foreach ( $tabModels as $tabModel ) {
+		foreach ( $tabModels as $index => $tabModel ) {
 			$tabContent = '';
 			try {
 				$tabContent = $this->prepareTransclusionPanel(
 					$tabModel->content,
 					$parser,
 					$frame,
-					$isCurrentlySelectedTab
+					$this->shouldInlineTab( $index )
 				);
 			} catch ( Exception ) {
 				$tabContent = Html::errorBox( 'Error processing tab: ' . $tabModel->label );
-			}
-
-			if ( $isCurrentlySelectedTab ) {
-				$isCurrentlySelectedTab = false;
 			}
 
 			$resolvedModels[] = new TabModel( $tabModel->name, $tabModel->label, $tabContent );
@@ -80,6 +76,10 @@ class TabberTransclude {
 		return $this->renderer->render(
 			$resolvedModels, $args, $parser, 'tabberneue-tabbertransclude-category'
 		);
+	}
+
+	private function shouldInlineTab( int $index ): bool {
+		return $index === 0 && !$this->config->get( 'TabberNeueTranscludeFirstTabOnDemand' );
 	}
 
 	/**
@@ -91,7 +91,7 @@ class TabberTransclude {
 		string $pageName,
 		Parser $parser,
 		PPFrame $frame,
-		bool $isCurrentlySelectedTab,
+		bool $shouldInlineTab,
 	): string {
 		$title = Title::newFromText( trim( $pageName ) );
 		if ( !$title ) {
@@ -103,7 +103,7 @@ class TabberTransclude {
 		$titleText = $title->getPrefixedText();
 		$wikitext = sprintf( '{{:%s}}', $titleText );
 
-		if ( $isCurrentlySelectedTab ) {
+		if ( $shouldInlineTab ) {
 			$html = $parser->recursiveTagParseFully(
 				$wikitext,
 				$frame

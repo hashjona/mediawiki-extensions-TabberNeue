@@ -158,6 +158,11 @@
 			"value": true,
 			"description": "If enabled, tabpanel IDs will be prepended with \"tabber-\". This avoids potential conflicts with page headings that use the same IDs.",
 			"public": true
+		},
+		"TabberNeueTranscludeFirstTabOnDemand": {
+			"value": false,
+			"description": "If enabled, <tabbertransclude> loads the first tab on demand through the API instead of rendering it as part of the parent page.",
+			"public": true
 		}
 	},
 	"Hooks": {
@@ -171,7 +176,8 @@
 				"TabberNeue.TabParser",
 				"TabberNeue.TabIdGenerator",
 				"HookContainer",
-				"TabberNeue.TabberRenderer"
+				"TabberNeue.TabberRenderer",
+				"MainConfig"
 			]
 		}
 	},

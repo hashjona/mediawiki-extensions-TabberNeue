@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace MediaWiki\Extension\TabberNeue;
 
+use MediaWiki\Config\Config;
 use MediaWiki\Extension\TabberNeue\Scribunto\LuaLibrary;
 use MediaWiki\Extension\TabberNeue\Service\TabberRenderer;
 use MediaWiki\Extension\TabberNeue\Service\TabIdGenerator;
@@ -19,6 +20,7 @@ class Hooks implements ParserFirstCallInitHook {
 		private readonly TabIdGenerator $tabIdGenerator,
 		private readonly HookContainer $hookContainer,
 		private readonly TabberRenderer $tabberRenderer,
+		private readonly Config $config,
 	) {
 	}
 
@@ -38,6 +40,7 @@ class Hooks implements ParserFirstCallInitHook {
 			$this->tabParser,
 			$this->tabIdGenerator,
 			$this->hookContainer,
+			$this->config,
 		), 'parserHook' ] );
 	}
 
