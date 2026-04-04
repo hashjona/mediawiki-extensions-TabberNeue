@@ -7,7 +7,8 @@ class TabModel {
 	public function __construct(
 		public string $name,
 		public string $label,
-		public string $content
+		public string $content,
+		public ?string $pageUrl = null
 	) {
 	}
 }

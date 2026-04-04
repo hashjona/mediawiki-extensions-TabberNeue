@@ -45,7 +45,8 @@ class TabberRenderer {
 				$tabModel->name,
 				$tabModel->label,
 				$tabModel->content,
-				$addTabPrefixConfig
+				$addTabPrefixConfig,
+				$tabModel->pageUrl
 			);
 			$tabsData[] = $tab->getTemplateData();
 		}

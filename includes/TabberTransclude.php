@@ -82,7 +82,9 @@ class TabberTransclude {
 				);
 			}
 
-			$resolvedModels[] = new TabModel( $tabModel->name, $tabModel->label, $tabContent );
+			$resolvedModels[] = new TabModel(
+				$tabModel->name, $tabModel->label, $tabContent, $tabModel->pageUrl
+			);
 		}
 
 		return $this->renderer->render(

@@ -15,7 +15,7 @@ class Transclude {
 			formatversion: 2,
 			oldid: this.revision,
 			redirects: true,
-			prop: 'text',
+			prop: 'text|modules|jsconfigvars',
 			disablelimitreport: true,
 			disabletoc: true,
 			disableeditsection: true,
@@ -57,7 +57,7 @@ class Transclude {
 			throw new Error( 'Invalid data structure received from server.' );
 		}
 
-		return data.parse.text;
+		return data.parse;
 	}
 
 	/**
@@ -81,11 +81,23 @@ class Transclude {
 				this.activeTabpanel.classList.add( 'tabber__panel--loading' );
 			}, 250 );
 
-			const data = await this.fetchData();
+			const parseResult = await this.fetchData();
 			this.activeTabpanel.classList.remove( 'tabber__panel--loading' );
 			clearTimeout( loadingTimerId );
 
-			this.activeTabpanel.innerHTML = data;
+			// Apply page-specific config vars and load any ResourceLoader modules
+			// required by the transcluded page (e.g. gallery styles, Cite, etc.)
+			// before inserting the content.
+			if ( parseResult.jsconfigvars ) {
+				mw.config.set( parseResult.jsconfigvars );
+			}
+			const modules = ( parseResult.modules || [] )
+				.concat( parseResult.modulestyles || [] );
+			if ( modules.length ) {
+				mw.loader.load( modules );
+			}
+
+			this.activeTabpanel.innerHTML = parseResult.text;
 
 			// Fire the wikipage.content hook for potential consumers of the hook
 			// eslint-disable-next-line no-jquery/no-jquery-constructor, no-undef

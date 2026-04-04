@@ -8,7 +8,8 @@ class TabberComponentTab implements TabberComponent {
 		private string $name,
 		private string $label,
 		private string $content,
-		private bool $addTabPrefix
+		private bool $addTabPrefix,
+		private ?string $pageUrl = null
 	) {
 	}
 
@@ -26,7 +27,7 @@ class TabberComponentTab implements TabberComponent {
 				],
 				[
 					'key' => 'href',
-					'value' => "#$id"
+					'value' => $this->pageUrl ?? "#$id"
 				],
 				[
 					'key' => 'aria-controls',

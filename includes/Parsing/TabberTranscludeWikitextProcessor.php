@@ -44,9 +44,12 @@ class TabberTranscludeWikitextProcessor implements WikitextProcessor {
 				continue;
 			}
 
+			$title = Title::newFromText( trim( $pageName ) );
+			[ $content, $pageUrl ] = $this->parseTabContent( $title, $pageName );
+
 			$baseId = $this->tabIdGenerator->generateSanitizedId( $label );
 			$uniqueName = $this->tabIdGenerator->ensureUniqueId( $baseId, $this->parser->getOutput() );
-			$tabModels[] = new TabModel( $uniqueName, $label, $this->parseTabContent( $pageName ) );
+			$tabModels[] = new TabModel( $uniqueName, $label, $content, $pageUrl );
 		}
 
 		return $tabModels;
@@ -54,23 +57,24 @@ class TabberTranscludeWikitextProcessor implements WikitextProcessor {
 
 	/**
 	 * Parses the tab content.
+	 *
+	 * @return array{string, ?string} [ content, pageUrl ]
 	 */
-	private function parseTabContent( string $contentWikitext ): string {
-		$content = trim( $contentWikitext );
-		if ( $content === '' ) {
-			return '';
+	private function parseTabContent( ?Title $title, string $rawPageName ): array {
+		if ( $title === null ) {
+			$content = trim( $rawPageName ) === ''
+				? ''
+				: $this->buildErrorBox( 'tabberneue-error-transclusion-invalid-title', $rawPageName );
+			return [ $content, null ];
 		}
 
-		$title = Title::newFromText( trim( $content ) );
-		if ( $title === null ) {
-			return $this->buildErrorBox( 'tabberneue-error-transclusion-invalid-title', $content );
-		}
+		$pageUrl = $title->getLocalURL();
 
 		if ( !$title->exists() || !$this->canReadTitle( $title ) ) {
-			return $this->buildErrorBox( 'tabberneue-error-transclusion-unavailable' );
+			return [ $this->buildErrorBox( 'tabberneue-error-transclusion-unavailable' ), $pageUrl ];
 		}
 
-		return $title->getPrefixedText();
+		return [ $title->getPrefixedText(), $pageUrl ];
 	}
 
 	private function canReadTitle( Title $title ): bool {
